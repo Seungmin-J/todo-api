@@ -35,10 +35,19 @@ public class TodoController {
         return new ResponseEntity<>(todoService.findTodoById(id), HttpStatus.OK);
     }
 
+    @GetMapping("/user/{id}")
+    public List<TodoResponseDto> findTodoByUserId(@PathVariable Long id) {
+        return todoService.findTodoByUserId(id);
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<TodoResponseDto> update(@PathVariable Long id, @RequestParam String text, @RequestParam String name) {
         return new ResponseEntity<>(todoService.update(id, text, name), HttpStatus.OK);
     }
 
+    @DeleteMapping("/{id}")
+    public void deleteTodo(@PathVariable Long id, @RequestBody String password) {
+        todoService.deleteTodo(id, password);
+    }
 
 }

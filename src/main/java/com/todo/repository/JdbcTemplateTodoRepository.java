@@ -1,5 +1,6 @@
 package com.todo.repository;
 
+import ch.qos.logback.core.util.StringUtil;
 import com.todo.dto.TodoResponseDto;
 import com.todo.entity.Todo;
 import org.springframework.http.HttpStatus;
@@ -8,6 +9,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.StringUtils;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.sql.DataSource;
@@ -54,15 +56,15 @@ public class JdbcTemplateTodoRepository implements TodoRepository {
         StringBuilder sql = new StringBuilder("SELECT * FROM todo");
         List<String> params = new ArrayList<>();
 
-        if (name != null || editedAt != null) {
+        if (StringUtils.hasText(name) || StringUtils.hasText(editedAt)) {
             sql.append(" WHERE");
 
-            if (name != null) {
+            if (StringUtils.hasText(name)) {
                 sql.append(" name = ?");
                 params.add(name);
             }
 
-            if (editedAt != null) {
+            if (StringUtils.hasText(editedAt)) {
                 if (!params.isEmpty()) {
                     sql.append(" AND");
                 }
@@ -81,16 +83,32 @@ public class JdbcTemplateTodoRepository implements TodoRepository {
         return result.stream().findAny().orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Does not exist id = " + id));
     }
 
+
+
     @Override
     public int update(Long id, String text, String name) {
         return jdbcTemplate.update("update todo set text = ?, name = ?, edited_at = ? where id = ?", text, name, LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),id);
     }
 
-//    @Override
-//    public Optional<Todo> findTodoById(Long id) {
-//        List<Todo> result = jdbcTemplate.query("select * from todo where id =?", todoRowMapperV2(), id);
-//        return result.stream().findAny();
-//    }
+    @Override
+    public void deleteTodo(Long id, String password) {
+        String storedPassword = jdbcTemplate.queryForObject(
+                "SELECT password FROM todo WHERE id = ?",
+                new Object[]{id},
+                String.class
+        );
+
+        if (password.equals(storedPassword)) {
+            jdbcTemplate.update("DELETE FROM todo WHERE id = ?", id);
+        } else {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "비밀번호가 일치하지 않습니다.");
+        }
+    }
+
+    @Override
+    public List<TodoResponseDto> findTodoByUserId(Long id) {
+        return jdbcTemplate.query("select * from todo where user",todoRowMapper());
+    }
 
     private RowMapper<TodoResponseDto> todoRowMapper() {
         return new RowMapper<TodoResponseDto>() {
