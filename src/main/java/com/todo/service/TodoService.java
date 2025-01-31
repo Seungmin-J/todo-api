@@ -3,6 +3,11 @@ package com.todo.service;
 import com.todo.dto.TodoRequestDto;
 import com.todo.dto.TodoResponseDto;
 
-public interface ScheduleService {
-    TodoResponseDto saveSchedule(TodoRequestDto dto);
+import java.util.List;
+
+public interface TodoService {
+    TodoResponseDto saveTodo(TodoRequestDto dto);
+    List<TodoResponseDto> findAllTodos(String name, String editedAt);
+    TodoResponseDto findTodoById(Long id);
+    TodoResponseDto update(Long id, String text, String name);
 }

@@ -1,11 +1,11 @@
-package com.scheduler.dto;
+package com.todo.dto;
 
 import lombok.Getter;
 
 @Getter
-public class ScheduleRequestDto {
+public class TodoRequestDto {
 
-    private String todo;
+    private String text;
     private String name;
     private String password;
 }
