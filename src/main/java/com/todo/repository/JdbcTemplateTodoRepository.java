@@ -8,32 +8,38 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Repository
-public class ScheduleRepositoryImpl implements ScheduleRepository{
+public class TodoRepositoryImpl implements TodoRepository {
 
     private final JdbcTemplate jdbcTemplate;
 
-    public ScheduleRepositoryImpl(JdbcTemplate jdbcTemplate) {
+    public TodoRepositoryImpl(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
     @Override
-    public TodoResponseDto saveSchedule(Todo todo) {
+    public TodoResponseDto saveTodo(Todo todo) {
         SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(jdbcTemplate);
-        jdbcInsert.withTableName("schedule").usingGeneratedKeyColumns("id");
+        jdbcInsert.withTableName("todo").usingGeneratedKeyColumns("id");
         Map<String, Object> parameters = new HashMap<>();
-        parameters.put("todo", todo.getTodo());
+        parameters.put("text", todo.getText());
         parameters.put("name", todo.getName());
         parameters.put("password", todo.getPassword());
-
+        parameters.put("created_at", todo.getCreatedAt());
 
         Number key = jdbcInsert.executeAndReturnKey(new MapSqlParameterSource(parameters));
         return new TodoResponseDto(key.longValue(),
-                todo.getTodo(),
+                todo.getText(),
                 todo.getName(),
                 todo.getCreatedAt(),
                 todo.getEditedAt());
+    }
+
+    @Override
+    public List<TodoResponseDto> findAllTodos() {
+        return List.of();
     }
 }

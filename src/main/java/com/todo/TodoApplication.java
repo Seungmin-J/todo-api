@@ -1,4 +1,4 @@
-package com.scheduler;
+package com.todo;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
