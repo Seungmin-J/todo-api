@@ -21,23 +21,19 @@ public class TodoController {
 
     @PostMapping
     public ResponseEntity<TodoResponseDto> createTodo(@RequestBody TodoRequestDto dto) {
-        return new ResponseEntity<>(todoService.saveTodo(dto), HttpStatus.CREATED);
+        TodoResponseDto todoResponseDto = todoService.saveTodo(dto);
+        return new ResponseEntity<>(todoResponseDto, HttpStatus.CREATED);
     }
 
     @GetMapping
-    public List<TodoResponseDto> findAllTodos(@RequestParam(required = false) String name,
+    public List<TodoResponseDto> findAllTodos(@RequestParam(required = false) Long userId,
                                               @RequestParam(required = false) String editedAt) {
-        return todoService.findAllTodos(name, editedAt);
+        return todoService.findAllTodos(userId, editedAt);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<TodoResponseDto> findTodoById(@PathVariable Long id) {
         return new ResponseEntity<>(todoService.findTodoById(id), HttpStatus.OK);
-    }
-
-    @GetMapping("/user/{id}")
-    public List<TodoResponseDto> findTodoByUserId(@PathVariable Long id) {
-        return todoService.findTodoByUserId(id);
     }
 
     @PutMapping("/{id}")

@@ -20,13 +20,13 @@ public class TodoServiceImpl implements TodoService {
 
     @Override
     public TodoResponseDto saveTodo(TodoRequestDto dto) {
-        Todo todo = new Todo(dto.getText(), dto.getName(), dto.getPassword());
+        Todo todo = new Todo(dto.getText(), dto.getPassword(), dto.getUserId());
         return todoRepository.saveTodo(todo);
     }
 
     @Override
-    public List<TodoResponseDto> findAllTodos(String name, String editedAt) {
-        return todoRepository.findAllTodos(name, editedAt);
+    public List<TodoResponseDto> findAllTodos(Long userId, String editedAt) {
+        return todoRepository.findAllTodos(userId, editedAt);
     }
 
     @Override
@@ -40,7 +40,6 @@ public class TodoServiceImpl implements TodoService {
         if (text == null || name == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
-
         int updated = todoRepository.update(id, text, name);
         if (updated == 0) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
@@ -54,11 +53,4 @@ public class TodoServiceImpl implements TodoService {
     public void deleteTodo(Long id, String password) {
         todoRepository.deleteTodo(id, password);
     }
-
-    @Override
-    public List<TodoResponseDto> findTodoByUserId(Long id) {
-
-        return null;
-    }
-
 }

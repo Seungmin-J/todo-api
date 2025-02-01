@@ -1,6 +1,5 @@
 package com.todo.repository;
 
-import ch.qos.logback.core.util.StringUtil;
 import com.todo.dto.TodoResponseDto;
 import com.todo.entity.Todo;
 import org.springframework.http.HttpStatus;
@@ -34,10 +33,10 @@ public class JdbcTemplateTodoRepository implements TodoRepository {
         jdbcInsert.withTableName("todo").usingGeneratedKeyColumns("id");
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("text", todo.getText());
-        parameters.put("name", todo.getName());
         parameters.put("password", todo.getPassword());
         parameters.put("created_at", todo.getCreatedAt());
         parameters.put("edited_at", todo.getEditedAt());
+        parameters.put("user_id", todo.getUserId());
 
         String createdAtStr = todo.getCreatedAt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
         String editedAtStr = todo.getEditedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
@@ -46,22 +45,25 @@ public class JdbcTemplateTodoRepository implements TodoRepository {
         return new TodoResponseDto(
                 key.longValue(),
                 todo.getText(),
-                todo.getName(),
                 createdAtStr,
-                editedAtStr);
+                editedAtStr,
+                todo.getUserId()
+                );
     }
 
     @Override
-    public List<TodoResponseDto> findAllTodos(String name, String editedAt) {
+    public List<TodoResponseDto> findAllTodos(Long userId, String editedAt) {
         StringBuilder sql = new StringBuilder("SELECT * FROM todo");
-        List<String> params = new ArrayList<>();
+        List<Object> params = new ArrayList<>();
 
-        if (StringUtils.hasText(name) || StringUtils.hasText(editedAt)) {
+        System.out.println("userId = " + userId);
+
+        if ((userId != null && userId > 0) || StringUtils.hasText(editedAt)) {
             sql.append(" WHERE");
 
-            if (StringUtils.hasText(name)) {
-                sql.append(" name = ?");
-                params.add(name);
+            if (userId != null && userId > 0) {
+                sql.append(" user_id = ?");
+                params.add(userId);
             }
 
             if (StringUtils.hasText(editedAt)) {
@@ -72,9 +74,12 @@ public class JdbcTemplateTodoRepository implements TodoRepository {
                 params.add(editedAt);
             }
         }
-
         sql.append(" ORDER BY edited_at DESC");
-        return jdbcTemplate.query(sql.toString(), params.toArray(), todoRowMapper());
+
+        System.out.println("SQL: " + sql);
+        System.out.println("Params: " + params);
+
+        return jdbcTemplate.query(sql.toString(), params.toArray(new Object[0]), todoRowMapper());
     }
 
     @Override
@@ -82,8 +87,6 @@ public class JdbcTemplateTodoRepository implements TodoRepository {
         List<Todo> result = jdbcTemplate.query("select * from todo where id = ?", todoRowMapperV2(), id);
         return result.stream().findAny().orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Does not exist id = " + id));
     }
-
-
 
     @Override
     public int update(Long id, String text, String name) {
@@ -105,11 +108,6 @@ public class JdbcTemplateTodoRepository implements TodoRepository {
         }
     }
 
-    @Override
-    public List<TodoResponseDto> findTodoByUserId(Long id) {
-        return jdbcTemplate.query("select * from todo where user",todoRowMapper());
-    }
-
     private RowMapper<TodoResponseDto> todoRowMapper() {
         return new RowMapper<TodoResponseDto>() {
             @Override
@@ -119,9 +117,9 @@ public class JdbcTemplateTodoRepository implements TodoRepository {
                 return new TodoResponseDto(
                         rs.getLong("id"),
                         rs.getString("text"),
-                        rs.getString("name"),
                         createdAt,
-                        editedAt);
+                        editedAt,
+                        rs.getLong("user_id"));
             }
         };
     }
@@ -133,9 +131,9 @@ public class JdbcTemplateTodoRepository implements TodoRepository {
                 return new Todo(
                         rs.getLong("id"),
                         rs.getString("text"),
-                        rs.getString("name"),
                         rs.getTimestamp("created_at").toLocalDateTime(),
-                        rs.getDate("edited_at").toLocalDate());
+                        rs.getDate("edited_at").toLocalDate(),
+                        rs.getLong("user_id"));
             }
         };
     }
