@@ -22,6 +22,6 @@ public class TodoResponseDto {
         this.text = todo.getText();
         this.createdAt = todo.getCreatedAt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
         this.editedAt = todo.getEditedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-        this.userId = todo.getId();
+        this.userId = todo.getUserId();
     }
 }
