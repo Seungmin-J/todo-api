@@ -1,11 +1,16 @@
 # Todo App
 할일을 작성하고 관리하는 앱<br>
 ## Introduction
-할일을 작성하고 관리하는 기본 CRUD 기능을 포함한 API입니다
+할일을 작성하고 관리하는 RESTful API입니다. 기본 CRUD 기능을 포함합니다
 <br>
 ## Tech Stack
   - **Language**:  
   ![Java](https://img.shields.io/badge/Java-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)
+- **Framework**:
+
+  ![Spring](https://img.shields.io/badge/Spring-6DB33F?style=for-the-badge&logo=spring&logoColor=white)  
+  ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-6DB33F?style=for-the-badge&logo=spring-boot&logoColor=white)  
+  ![Lombok](https://img.shields.io/badge/Lombok-red?style=for-the-badge&logo=lombok&logoColor=white)
 
 - **Database**:  
   ![MySQL](https://img.shields.io/badge/MySQL-005C84?style=for-the-badge&logo=mysql&logoColor=white)
@@ -44,16 +49,16 @@
 ---
 
 ## **4. 선택 일정, 이름 수정**
-| **Method** | **URL** | **PathVariable** | **Request Body** | **Response**    | **Status** |
+| **Method** | **URL** | **PathVariable** | **Request Param** | **Response**    | **Status** |
 |------------|---------|--------------------|------------------|-----------------|------------|
-| `PUT`      | `/todos/{id}` | `id`: 수정할 일정의 ID | ```json { "name": "String 수정된 작성자 이름" }``` | TodoResponseDto | -          |
+| `PUT`      | `/todos/{id}` | `id`: 수정할 일정의 ID | `name`: 작성자명 `text`: 할일 | TodoResponseDto | -          |
 
 ---
 
 ## **5. 선택 일정 삭제**
 | **Method** | **URL** | **PathVariable** | **Request Body**              | **Response** | **Status** |
 |------------|---------|-------------------|-------------------------------|--------------|------------|
-| `DELETE`   | `/todos/{id}` | `id`: 삭제할 일정의 ID | ```"your_password"(text형식)``` | -            | -          |
+| `DELETE`   | `/todos/{id}` | `id`: 삭제할 일정의 ID | "비밀번호"(text형식) | -            | -          |
 
 
 # **ERD**
