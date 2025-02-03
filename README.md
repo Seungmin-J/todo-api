@@ -1,3 +1,25 @@
+# Todo App
+할일을 작성하고 관리하는 앱<br>
+## Introduction
+할일을 작성하고 관리하는 기본 CRUD 기능을 포함한 API입니다
+<br>
+## Tech Stack
+  - **Language**:  
+  ![Java](https://img.shields.io/badge/Java-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)
+
+- **Database**:  
+  ![MySQL](https://img.shields.io/badge/MySQL-005C84?style=for-the-badge&logo=mysql&logoColor=white)
+
+- **Tools**:  
+  ![Git](https://img.shields.io/badge/Git-F05033?style=for-the-badge&logo=git&logoColor=white)  
+  ![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white)
+
+## Installation
+리포지토리 클론:
+```bash
+   git clone https://github.com/Seungmin-J/kiosk.git
+```
+
 # **Todo API 명세서**
 
 ## **1. 일정 생성**
@@ -36,3 +58,7 @@
 
 # **ERD**
 ![img.png](src/main/resources/static/img.png)
+
+## Contact
+- **Email**: [seungmin103@gmail.com](mailto:seungmin103@gmail.com)  
+- **GitHub**: [Seungmin-J](https://github.com/Seungmin-J)  
