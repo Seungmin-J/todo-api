@@ -17,7 +17,7 @@
 ## Installation
 리포지토리 클론:
 ```bash
-   git clone https://github.com/Seungmin-J/kiosk.git
+  git clone https://github.com/Seungmin-J/todo-api.git
 ```
 
 # **Todo API 명세서**
