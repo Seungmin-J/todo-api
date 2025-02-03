@@ -51,14 +51,14 @@
 ## **4. 선택 일정, 이름 수정**
 | **Method** | **URL** | **PathVariable** | **Request Param** | **Response**    | **Status** |
 |------------|---------|--------------------|------------------|-----------------|------------|
-| `PUT`      | `/todos/{id}` | `id`: 수정할 일정의 ID | `name`: 작성자명 `text`: 할일 | TodoResponseDto | -          |
+| `PUT`      | `/todos/{id}` | `id`: 수정할 일정의 ID | `name`: 작성자명 `text`: 할일 | TodoResponseDto | OK : 200<br/>NOT_FOUND : 404          |
 
 ---
 
 ## **5. 선택 일정 삭제**
 | **Method** | **URL** | **PathVariable** | **Request Body**              | **Response** | **Status** |
 |------------|---------|-------------------|-------------------------------|--------------|------------|
-| `DELETE`   | `/todos/{id}` | `id`: 삭제할 일정의 ID | "비밀번호"(text형식) | -            | -          |
+| `DELETE`   | `/todos/{id}` | `id`: 삭제할 일정의 ID | "비밀번호"(text형식) | -            | OK : 200<br/>BAD_REQUEST : 400          |
 
 
 # **ERD**
