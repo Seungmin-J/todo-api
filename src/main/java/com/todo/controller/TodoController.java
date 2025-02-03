@@ -37,8 +37,8 @@ public class TodoController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<TodoResponseDto> update(@PathVariable Long id, @RequestParam String text, @RequestParam String name) {
-        return new ResponseEntity<>(todoService.update(id, text, name), HttpStatus.OK);
+    public ResponseEntity<TodoResponseDto> updateTodoAndUserName(@PathVariable Long id, @RequestParam String text, @RequestParam String name) {
+        return new ResponseEntity<>(todoService.updateTodoAndUserName(id, text, name), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")

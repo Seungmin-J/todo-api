@@ -10,6 +10,6 @@ public interface TodoRepository {
     TodoResponseDto saveTodo(Todo todo);
     List<TodoResponseDto> findAllTodos(Long userId, String editedAt);
     Todo findTodoByIdOrElseThrow(Long id);
-    int update(Long id, String text, String name);
+    Todo updateTodoAndUserName(Long id, String text, String name);
     void deleteTodo(Long id, String password);
 }

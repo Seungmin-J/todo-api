@@ -8,6 +8,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -27,10 +28,15 @@ public class JdbcTemplateTodoRepository implements TodoRepository {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
+    @Transactional
     @Override
     public TodoResponseDto saveTodo(Todo todo) {
+        // SimpleJdbcInsert를 사용하면 데이터를 테이블에 INSERT할 수 있다
         SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(jdbcTemplate);
+        // 데이터를 INSERT할 테이블은 'todo'이고 만들어진 row의 id를 가져오기위해
+        // withTableName("todo").usingGeneratedKeyColumns("id")
         jdbcInsert.withTableName("todo").usingGeneratedKeyColumns("id");
+        // DB의 컬럼명과 일치한 key에 todo 객체의 값을 value로 넣어준다
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("text", todo.getText());
         parameters.put("password", todo.getPassword());
@@ -40,24 +46,25 @@ public class JdbcTemplateTodoRepository implements TodoRepository {
 
         String createdAtStr = todo.getCreatedAt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
         String editedAtStr = todo.getEditedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-
+        // SimpleJdbcInsert를 실행할 때 위에서 Map에 담은 데이터를 매핑하고 id 값을 받아온다
         Number key = jdbcInsert.executeAndReturnKey(new MapSqlParameterSource(parameters));
+        // ResponseDto를 생성해서 반환
         return new TodoResponseDto(
                 key.longValue(),
                 todo.getText(),
                 createdAtStr,
                 editedAtStr,
                 todo.getUserId()
-                );
+        );
     }
 
+    @Transactional
     @Override
     public List<TodoResponseDto> findAllTodos(Long userId, String editedAt) {
         StringBuilder sql = new StringBuilder("SELECT * FROM todo");
         List<Object> params = new ArrayList<>();
 
-        System.out.println("userId = " + userId);
-
+        // userId가 1이상이거나 editedAt에 text 전달됐을 때
         if ((userId != null && userId > 0) || StringUtils.hasText(editedAt)) {
             sql.append(" WHERE");
 
@@ -76,21 +83,38 @@ public class JdbcTemplateTodoRepository implements TodoRepository {
         }
         sql.append(" ORDER BY edited_at DESC");
 
-        System.out.println("SQL: " + sql);
-        System.out.println("Params: " + params);
-
         return jdbcTemplate.query(sql.toString(), params.toArray(new Object[0]), todoRowMapper());
     }
 
+    @Transactional
     @Override
     public Todo findTodoByIdOrElseThrow(Long id) {
         List<Todo> result = jdbcTemplate.query("select * from todo where id = ?", todoRowMapperV2(), id);
-        return result.stream().findAny().orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Does not exist id = " + id));
+        return result.stream().findAny().orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "존재하지 않는 id = " + id));
     }
 
+    @Transactional
     @Override
-    public int update(Long id, String text, String name) {
-        return jdbcTemplate.update("update todo set text = ?, name = ?, edited_at = ? where id = ?", text, name, LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),id);
+    public Todo updateTodoAndUserName(Long id, String text, String name) {
+        int updatedTodo = jdbcTemplate.update(
+                "UPDATE todo SET text = ?, edited_at = ? WHERE id = ?",
+                text,
+                LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
+                id
+        );
+
+        int updatedUser = jdbcTemplate.update(
+                "UPDATE users SET name = ? WHERE id = (SELECT user_id FROM todo WHERE id = ?)",
+                name,
+                id
+        );
+
+        // 업데이트 되었는지 확인
+        if (updatedTodo == 0 || updatedUser == 0) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "업데이트할 데이터가 존재하지 않습니다.");
+        }
+
+        return findTodoByIdOrElseThrow(id);
     }
 
     @Override
@@ -108,6 +132,7 @@ public class JdbcTemplateTodoRepository implements TodoRepository {
         }
     }
 
+    // TodoResponseDto 를 반환
     private RowMapper<TodoResponseDto> todoRowMapper() {
         return new RowMapper<TodoResponseDto>() {
             @Override
@@ -124,6 +149,7 @@ public class JdbcTemplateTodoRepository implements TodoRepository {
         };
     }
 
+    // Todo 를 반환
     private RowMapper<Todo> todoRowMapperV2() {
         return new RowMapper<Todo>() {
             @Override

@@ -4,7 +4,6 @@ import com.todo.entity.Todo;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 @Getter

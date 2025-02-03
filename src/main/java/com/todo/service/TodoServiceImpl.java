@@ -6,6 +6,7 @@ import com.todo.entity.Todo;
 import com.todo.repository.TodoRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
@@ -35,18 +36,16 @@ public class TodoServiceImpl implements TodoService {
         return new TodoResponseDto(todo);
     }
 
-    @Override
-    public TodoResponseDto update(Long id, String text, String name) {
+    @Transactional
+    public TodoResponseDto updateTodoAndUserName(Long id, String text, String name) {
         if (text == null || name == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-        }
-        int updated = todoRepository.update(id, text, name);
-        if (updated == 0) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "text와 name은 필수 입력값입니다.");
         }
 
-        Todo todo = todoRepository.findTodoByIdOrElseThrow(id);
-        return new TodoResponseDto(todo);
+        // 업데이트와 동시에 변경된 객체 반환
+        Todo updatedTodo = todoRepository.updateTodoAndUserName(id, text, name);
+
+        return new TodoResponseDto(updatedTodo);
     }
 
     @Override

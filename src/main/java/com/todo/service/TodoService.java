@@ -9,6 +9,6 @@ public interface TodoService {
     TodoResponseDto saveTodo(TodoRequestDto dto);
     List<TodoResponseDto> findAllTodos(Long userId, String editedAt);
     TodoResponseDto findTodoById(Long id);
-    TodoResponseDto update(Long id, String text, String name);
+    TodoResponseDto updateTodoAndUserName(Long id, String text, String name);
     void deleteTodo(Long id, String password);
 }
